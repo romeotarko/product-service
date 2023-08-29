@@ -2,6 +2,8 @@ package com.programmingtech.productservice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.programmingtech.productservice.dto.ProductRequest;
+import com.programmingtech.productservice.repository.ProductRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,6 +34,9 @@ class ProductServiceApplicationTests {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    ProductRepository productRepository;
+
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry dynamicPropertyRegistry) {
         dynamicPropertyRegistry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
@@ -44,6 +49,7 @@ class ProductServiceApplicationTests {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/product")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(productRequestString)).andExpect(status().isCreated());
+        Assertions.assertEquals(1, productRepository.findAll().size());
     }
 
     private ProductRequest getProductRequest() {
